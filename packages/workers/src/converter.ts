@@ -1075,9 +1075,8 @@ export async function convertMarkdownToDocx(content: string, options?: HtmlConve
     const headingMatch = trimmed.match(/^(#{1,6})\s+(.+)$/);
     if (headingMatch) {
       const level = headingMatch[1].length;
-      const text = escapeXml(stripInline(headingMatch[2]));
       bodyParts.push(
-        `<w:p><w:pPr><w:pStyle w:val="Heading${level}"/></w:pPr><w:r><w:t>${text}</w:t></w:r></w:p>`
+        `<w:p><w:pPr><w:pStyle w:val="Heading${level}"/></w:pPr>${mdInlineToDocxXml(headingMatch[2])}</w:p>`
       );
       i++;
       continue;
@@ -1140,13 +1139,12 @@ export async function convertMarkdownToDocx(content: string, options?: HtmlConve
     if (/^[\s]*[-*+]\s+/.test(trimmed)) {
       const items: string[] = [];
       while (i < lines.length && /^[\s]*[-*+]\s+/.test(lines[i])) {
-        items.push(stripInline(lines[i].replace(/^[\s]*[-*+]\s+/, '')));
+        items.push(mdInlineToDocxXml(lines[i].replace(/^[\s]*[-*+]\s+/, '')));
         i++;
       }
       for (const item of items) {
         bodyParts.push(
-          `<w:p><w:pPr><w:ind w:left="360"/><w:pBdr><w:left w:val="single" w:sz="4" w:space="4" w:color="A68B4B"/></w:pBdr></w:pPr>` +
-          `<w:r><w:t xml:space="preserve">  ${escapeXml(item)}</w:t></w:r></w:p>`
+          `<w:p><w:pPr><w:ind w:left="360"/><w:pBdr><w:left w:val="single" w:sz="4" w:space="4" w:color="A68B4B"/></w:pBdr></w:pPr>${item}</w:p>`
         );
       }
       continue;
@@ -1156,20 +1154,20 @@ export async function convertMarkdownToDocx(content: string, options?: HtmlConve
     if (/^[\s]*\d+\.\s+/.test(trimmed)) {
       const items: string[] = [];
       while (i < lines.length && /^[\s]*\d+\.\s+/.test(lines[i])) {
-        items.push(stripInline(lines[i].replace(/^[\s]*\d+\.\s+/, '')));
+        items.push(mdInlineToDocxXml(lines[i].replace(/^[\s]*\d+\.\s+/, '')));
         i++;
       }
       for (let idx = 0; idx < items.length; idx++) {
         bodyParts.push(
           `<w:p><w:pPr><w:ind w:left="360"/></w:pPr>` +
-          `<w:r><w:t xml:space="preserve">${idx + 1}. ${escapeXml(items[idx])}</w:t></w:r></w:p>`
+          `<w:r><w:t xml:space="preserve">${idx + 1}. </w:t></w:r>${items[idx]}</w:p>`
         );
       }
       continue;
     }
 
     // Regular paragraph
-    bodyParts.push(`<w:p><w:r><w:t xml:space="preserve">${escapeXml(stripInline(trimmed))}</w:t></w:r></w:p>`);
+    bodyParts.push(`<w:p>${mdInlineToDocxXml(trimmed)}</w:p>`);
     i++;
   }
 
@@ -2404,12 +2402,10 @@ async function convertLatexToPdfViaHtml(
     doc.fontSize(18).font('Helvetica-Bold').text(baseName, { align: 'center' });
     doc.moveDown();
 
-    // Strip script/style content, then parse HTML into pdfkit formatting
     let cleanHtml = html
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
       .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
 
-    // Decode HTML entities
     cleanHtml = cleanHtml
       .replace(/&nbsp;/g, ' ')
       .replace(/&amp;/g, '&')
@@ -2418,11 +2414,44 @@ async function convertLatexToPdfViaHtml(
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'");
 
-    // Parse block-level elements and render with appropriate formatting
     const blocks = cleanHtml.split(/(<\/?(?:h[1-6]|p|ul|ol|li|pre|blockquote|hr|br)[^>]*>)/gi);
     let inList = false;
     let listOrdered = false;
     let listCounter = 0;
+
+    /**
+     * Render inline HTML (bold, italic, code, links) within a text block
+     * using pdfkit's continued: true for multi-format runs on one line.
+     */
+    const renderInline = (blockText: string, indent?: number) => {
+      const parts = blockText.split(/(<strong>.+?<\/strong>|<b>.+?<\/b>|<em>.+?<\/em>|<i>.+?<\/i>|<code>.+?<\/code>|<a\s+[^>]*>.+?<\/a>)/gi);
+      for (let pi = 0; pi < parts.length; pi++) {
+        const part = parts[pi];
+        if (!part) continue;
+        const lower = part.toLowerCase();
+        if (lower.startsWith('<strong>') || lower.startsWith('<b>')) {
+          const txt = part.replace(/<\/?(?:strong|b)>/gi, '');
+          doc.font('Helvetica-Bold').fontSize(11);
+          doc.text(txt, { continued: pi < parts.length - 1, indent });
+        } else if (lower.startsWith('<em>') || lower.startsWith('<i>')) {
+          const txt = part.replace(/<\/?(?:em|i)>/gi, '');
+          doc.font('Helvetica-Oblique').fontSize(11);
+          doc.text(txt, { continued: pi < parts.length - 1, indent });
+        } else if (lower.startsWith('<code>')) {
+          const txt = part.replace(/<\/?code>/gi, '');
+          doc.font('Courier').fontSize(9);
+          doc.text(txt, { continued: pi < parts.length - 1, indent });
+        } else if (lower.startsWith('<a ')) {
+          const txt = part.replace(/<a\s+[^>]*>/i, '').replace(/<\/a>/i, '');
+          doc.font('Helvetica').fontSize(11).fillColor('blue');
+          doc.text(txt, { continued: pi < parts.length - 1, indent });
+          doc.fillColor('black');
+        } else {
+          doc.font('Helvetica').fontSize(11);
+          doc.text(part.replace(/<[^>]+>/g, ''), { continued: pi < parts.length - 1, indent });
+        }
+      }
+    };
 
     for (const block of blocks) {
       const lower = block.toLowerCase().trim();
@@ -2450,7 +2479,7 @@ async function convertLatexToPdfViaHtml(
           const prefix = listOrdered ? `${listCounter}. ` : '- ';
           if (listOrdered) listCounter++;
           doc.font('Helvetica').fontSize(11);
-          doc.text(prefix, { indent: 20, continued: false });
+          doc.text(prefix, { indent: 20, continued: true });
         }
         continue;
       }
@@ -2471,18 +2500,9 @@ async function convertLatexToPdfViaHtml(
       }
       if (lower.startsWith('<br')) { doc.moveDown(0.2); continue; }
 
-      // Text content — apply inline formatting
-      const text = block
-        .replace(/<strong>|<\/strong>/gi, '')
-        .replace(/<b>|<\/b>/gi, '')
-        .replace(/<em>|<\/em>/gi, '')
-        .replace(/<i>|<\/i>/gi, '')
-        .replace(/<code>|<\/code>/gi, '')
-        .replace(/<[^>]+>/g, '')
-        .trim();
-
+      const text = block.replace(/<[^>]+>/g, '').trim();
       if (text) {
-        doc.text(text, { align: 'left' });
+        renderInline(block);
       }
     }
 
@@ -2542,6 +2562,9 @@ export async function convertFile(
       'mermaid->md': true,
       'mermaid->html': true,
       'mermaid->csv': true,
+      'mermaid->docx': true,
+      'mermaid->latex': true,
+      'mermaid->pdf': true,
       'latex->md': true,
       'latex->html': true,
       'latex->txt': true,
@@ -2556,7 +2579,7 @@ export async function convertFile(
     };
 
     if (!supportedConversions[conversionKey]) {
-      return fail(sourcePath, targetFormat, startTime, `Conversion ${sourceFormat} → ${targetFormat} is not supported. Supported: md→txt/html/csv/docx/latex, csv→txt/md/html/docx/csv/latex, txt→md/html/csv/docx/latex, mermaid→txt/md/html/csv, latex→md/html/txt/docx/pdf, docx→txt/md/html/csv/latex/pdf`);
+      return fail(sourcePath, targetFormat, startTime, `Conversion ${sourceFormat} → ${targetFormat} is not supported. Supported: md→txt/html/csv/docx/latex, csv→txt/md/html/docx/csv/latex, txt→md/html/csv/docx/latex, mermaid→txt/md/html/csv/docx/latex/pdf, latex→md/html/txt/docx/pdf, docx→txt/md/html/csv/latex/pdf`);
     }
 
     // Read source file (DOCX is binary, others are UTF-8 text)
@@ -2618,6 +2641,15 @@ export async function convertFile(
         break;
       case 'mermaid->csv':
         converted = convertMermaidToCsv(content as string);
+        break;
+      case 'mermaid->docx':
+        converted = await convertMarkdownToDocx('```mermaid\n' + (content as string) + '\n```\n', htmlOptions);
+        break;
+      case 'mermaid->latex':
+        converted = convertMarkdownToLatex('```mermaid\n' + (content as string) + '\n```\n');
+        break;
+      case 'mermaid->pdf':
+        converted = await convertLatexToPdf(convertMarkdownToLatex('```mermaid\n' + (content as string) + '\n```\n'), outputDir, sourcePath, htmlOptions);
         break;
       // --- LaTeX as source ---
       case 'latex->md':
@@ -2745,7 +2777,51 @@ function stripInline(text: string): string {
     .replace(/<[^>]+>/g, '');
 }
 
-/** Apply inline markdown → HTML conversions */
+/**
+ * Convert inline markdown formatting to DOCX run XML elements.
+ * Handles bold, italic, bold+italic, inline code, links, images,
+ * and strikethrough. Returns one or more <w:r> elements.
+ */
+function mdInlineToDocxXml(text: string): string {
+  const parts: string[] = [];
+
+  const pushRun = (content: string, props?: { bold?: boolean; italic?: boolean; code?: boolean; strike?: boolean; link?: string }) => {
+    if (content.length === 0) return;
+    let rPr = '';
+    if (props?.bold) rPr += '<w:b/>';
+    if (props?.italic) rPr += '<w:i/>';
+    if (props?.strike) rPr += '<w:strike/>';
+    if (props?.code) rPr += '<w:rFonts w:ascii="Courier New" w:hAnsi="Courier New"/><w:sz w:val="18"/><w:color w:val="333333"/>';
+    if (props?.link) rPr += '<w:u w:val="single"/><w:color w:val="0563C1"/>';
+    const rPrXml = rPr ? `<w:rPr>${rPr}</w:rPr>` : '';
+    parts.push(`<w:r>${rPrXml}<w:t xml:space="preserve">${escapeXml(content)}</w:t></w:r>`);
+  };
+
+  const pattern = /(\*\*\*(.+?)\*\*\*)|(\*\*(.+?)\*\*)|(__(.+?)__)|(\*(.+?)\*)|(_(.+?)_)|(`(.+?)`)|(~~(.+?)~~)|(!\[([^\]]*)\]\(([^)]*)\))|(\[([^\]]*)\]\(([^)]*)\))/;
+  let remaining = text;
+
+  while (remaining.length > 0) {
+    const m = pattern.exec(remaining);
+    if (!m) {
+      pushRun(remaining);
+      break;
+    }
+
+    if (m.index > 0) pushRun(remaining.slice(0, m.index));
+
+    if (m[2]) pushRun(m[2], { bold: true, italic: true });
+    else if (m[4] || m[6]) pushRun(m[4] || m[6], { bold: true });
+    else if (m[8] || m[10]) pushRun(m[8] || m[10], { italic: true });
+    else if (m[12]) pushRun(m[12], { code: true });
+    else if (m[14]) pushRun(m[14], { strike: true });
+    else if (m[16]) pushRun(`[Image: ${m[16]}]`, { italic: true });
+    else if (m[18]) pushRun(m[18], { link: m[19] });
+
+    remaining = remaining.slice(m.index + m[0].length);
+  }
+
+  return parts.join('');
+}
 function applyInlineHtml(text: string): string {
   return escapeHtml(text)
     // Bold

@@ -242,7 +242,7 @@ interface SidebarProps {
     status: string;
     timeAgo: string;
   }>;
-  themeSkin?: 'papyrus' | 'halftone' | 'isometric' | 'minimalart' | 'threejs';
+  themeSkin?: 'papyrus' | 'halftone' | 'isometric' | 'minimalart';
   clockWidget?: React.ReactNode;
 }
 

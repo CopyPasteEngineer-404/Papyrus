@@ -21,7 +21,6 @@ const sizeMap = {
  * - Halftone: Newspaper press with rollers and ink splatter
  * - Isometric: 3D wireframe rotating and building
  * - Minimal Art: Elegant minimal circle with varying line weight
- * - Three.js: Glowing orb with orbiting particles
  */
 export const ScribbleLoader: React.FC<ScribbleLoaderProps> = ({ size = 'md', className, label }) => {
   const { themeSkin } = useTheme();

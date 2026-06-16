@@ -80,7 +80,7 @@ export interface ConvertFilePayload {
 export interface SettingsPayload {
   aiProvider: 'ollama' | 'openai' | 'none';
   theme: 'light' | 'dark' | 'system';
-  themeSkin: 'papyrus' | 'halftone' | 'isometric' | 'minimalart' | 'threejs';
+  themeSkin: 'papyrus' | 'halftone' | 'isometric' | 'minimalart';
   defaultConstraints?: ConstraintSet;
   recentWorkspaces: Array<{ path: string; name: string; lastOpened: number }>;
 }
