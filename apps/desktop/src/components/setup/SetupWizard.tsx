@@ -491,7 +491,6 @@ const ThemeStep: React.FC<{
     { id: 'halftone' as const, name: 'Halftone', desc: 'Retro newsprint dot-matrix printing', color: '#2C7DA0', icon: '📰' },
     { id: 'isometric' as const, name: 'Isometric', desc: '3D geometric depth with clean lines', color: '#6C8EBF', icon: '📐' },
     { id: 'minimalart' as const, name: 'Minimal Art', desc: 'Gallery refinement and clean space', color: '#C87941', icon: '🎨' },
-    { id: 'threejs' as const, name: 'Three.js', desc: 'Ancient quill & ink in immersive 3D', color: '#C4A265', icon: '🖋️' },
   ];
 
   return (

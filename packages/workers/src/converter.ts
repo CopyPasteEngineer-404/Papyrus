@@ -945,6 +945,68 @@ export function convertMermaidToCsv(content: string): string {
   return rows.map(row => row.join(',')).join('\n') + '\n';
 }
 
+/**
+ * Convert Mermaid diagram source to plain text description.
+ * Extracts node labels, edges, and key structural elements as readable text.
+ */
+export function convertMermaidToText(content: string): string {
+  const lines = content.trim().split(/\r?\n/);
+  const output: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('%%')) continue;
+    if (trimmed.startsWith('graph ') || trimmed.startsWith('flowchart ')) {
+      output.push(`[Diagram: ${trimmed}]`);
+      continue;
+    }
+    if (trimmed.startsWith('sequenceDiagram')) {
+      output.push('[Sequence Diagram]');
+      continue;
+    }
+    if (trimmed.startsWith('classDiagram')) {
+      output.push('[Class Diagram]');
+      continue;
+    }
+    if (trimmed.startsWith('erDiagram')) {
+      output.push('[ER Diagram]');
+      continue;
+    }
+    if (trimmed.startsWith('gantt')) {
+      output.push('[Gantt Chart]');
+      continue;
+    }
+    if (trimmed.startsWith('pie')) {
+      output.push('[Pie Chart]');
+      continue;
+    }
+    if (trimmed.startsWith('stateDiagram')) {
+      output.push('[State Diagram]');
+      continue;
+    }
+    const arrow = trimmed.match(/^(.+?)(-{2,}[>x]?|={2,}[>]?|--[>x]?)(.+)$/);
+    if (arrow) {
+      const src = arrow[1].trim().replace(/[\[\]\(\)"]/g, '');
+      const dst = arrow[3].trim().replace(/[\[\]\(\)"]/g, '');
+      output.push(`${src} -> ${dst}`);
+      continue;
+    }
+    const node = trimmed.match(/^(\w+)\[([^\]]+)\]/);
+    if (node) {
+      output.push(`${node[1]}: ${node[2]}`);
+      continue;
+    }
+    const node2 = trimmed.match(/^(\w+)\(([^\)]+)\)/);
+    if (node2) {
+      output.push(`${node2[1]}: ${node2[2]}`);
+      continue;
+    }
+    output.push(trimmed);
+  }
+
+  return output.join('\n') || content;
+}
+
 /** CSV-escape a cell value (wrap in quotes if it contains comma, quote, or newline) */
 function csvEscapeCell(value: string): string {
   if (!value) return '';
@@ -1168,8 +1230,8 @@ export async function convertCsvToDocx(content: string, options?: HtmlConversion
   return buildDocxZip(title, bodyXml);
 }
 
-/** Build a valid DOCX ZIP archive from title and body XML */
-async function buildDocxZip(title: string, bodyXml: string): Promise<Buffer> {
+/** Build a valid DOCX ZIP archive from body XML */
+async function buildDocxZip(_title: string, bodyXml: string): Promise<Buffer> {
   const files: Record<string, Buffer> = {};
 
   // [Content_Types].xml
@@ -1411,17 +1473,41 @@ export function convertLatexToMarkdown(content: string): string {
   let inEnumerate = false;
   let enumCounter = 0;
 
-  // Strip comments
   const stripComments = (line: string): string => {
-    // Remove LaTeX comments (but not escaped \%)
     return line.replace(/(?<!\\)%.*$/, '');
   };
 
   while (i < lines.length) {
+    // Check for verbatim/code blocks BEFORE comment stripping
+    const preTrimmed = lines[i].trim();
+    if (preTrimmed.startsWith('\\begin{verbatim}')) {
+      const codeLines: string[] = [];
+      i++;
+      while (i < lines.length && !lines[i].trim().startsWith('\\end{verbatim}')) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      i++;
+      output.push('', '```', codeLines.join('\n'), '```', '');
+      continue;
+    }
+    if (preTrimmed.startsWith('\\begin{lstlisting}')) {
+      const langMatch = preTrimmed.match(/\\begin\{lstlisting\}(?:\[.*?\])?\{?(\w*)\}?/);
+      const lang = langMatch ? langMatch[1] : '';
+      const codeLines: string[] = [];
+      i++;
+      while (i < lines.length && !lines[i].trim().startsWith('\\end{lstlisting}')) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      i++;
+      output.push('', `\`\`\`${lang}`, codeLines.join('\n'), '```', '');
+      continue;
+    }
+
     let line = stripComments(lines[i]);
     const trimmed = line.trim();
 
-    // Skip empty preamble lines
     if (!inDocument) {
       if (trimmed.startsWith('\\begin{document}')) {
         inDocument = true;
@@ -1432,12 +1518,10 @@ export function convertLatexToMarkdown(content: string): string {
       continue;
     }
 
-    // End of document
     if (trimmed.startsWith('\\end{document}')) {
       break;
     }
 
-    // --- Title / Author / Date ---
     if (trimmed.startsWith('\\title{')) {
       const title = extractBraceContent(trimmed, '\\title{');
       if (title) output.push(`# ${title}`, '');
@@ -1526,32 +1610,6 @@ export function convertLatexToMarkdown(content: string): string {
         output.push(`- ${convertLatexInlineToMd(itemText)}`);
       }
       i++; continue;
-    }
-
-    // --- Verbatim / Code ---
-    if (trimmed.startsWith('\\begin{verbatim}')) {
-      const codeLines: string[] = [];
-      i++;
-      while (i < lines.length && !lines[i].trim().startsWith('\\end{verbatim}')) {
-        codeLines.push(lines[i]);
-        i++;
-      }
-      i++; // skip \end{verbatim}
-      output.push('', '```', codeLines.join('\n'), '```', '');
-      continue;
-    }
-    if (trimmed.startsWith('\\begin{lstlisting}')) {
-      const langMatch = trimmed.match(/\\begin\{lstlisting\}(?:\[.*?\])?\{?(\w*)\}?/);
-      const lang = langMatch ? langMatch[1] : '';
-      const codeLines: string[] = [];
-      i++;
-      while (i < lines.length && !lines[i].trim().startsWith('\\end{lstlisting}')) {
-        codeLines.push(lines[i]);
-        i++;
-      }
-      i++; // skip \end{lstlisting}
-      output.push('', `\`\`\`${lang}`, codeLines.join('\n'), '```', '');
-      continue;
     }
 
     // --- Math environments ---
@@ -1762,8 +1820,8 @@ function convertLatexInlineToMd(text: string): string {
     .replace(/\\sout\{([^}]*)\}/g, '~~$1~~')
     // Inline math: $...$ → $...$ (preserve for markdown math)
     .replace(/\\\(([^)]*)\\\)/g, '$$$1$$$')  // \(...\) → $...$
-    // Links: \href{url}{text} → [text](url)
-    .replace(/\\href\{([^}]*)\}\{([^}]*)\}/g, '[$2]($1)')
+    // Links: \href{url}{text} → [text](url) — encode tildes to %7E first
+    .replace(/\\href\{([^}]*)\}\{([^}]*)\}/g, (_, url: string, text: string) => `[${text}](${url.replace(/~/g, '%7E')})`)
     // URL: \url{...} → just the URL (preserve tildes as %7E for URLs)
     .replace(/\\url\{([^}]*)\}/g, (_, url: string) => url.replace(/~/g, '%7E'))
     // Line breaks
@@ -2319,7 +2377,9 @@ export async function convertLatexToPdf(
 }
 
 /**
- * Fallback: Convert LaTeX → HTML → plain text → PDF using pdfkit
+ * Fallback: Convert LaTeX → PDF using pdfkit with HTML-aware formatting.
+ * Parses basic HTML tags (h1-h6, p, strong, em, code, ul, ol, li, br) and
+ * applies corresponding pdfkit formatting commands to preserve document structure.
  */
 async function convertLatexToPdfViaHtml(
   content: string,
@@ -2327,42 +2387,104 @@ async function convertLatexToPdfViaHtml(
   sourcePath: string,
   htmlOptions?: HtmlConversionOptions,
 ): Promise<Buffer> {
-  // Step 1: Convert LaTeX to HTML
   const html = convertLatexToHtml(content, htmlOptions);
 
-  // Step 2: Strip HTML tags to get plain text (pdfkit doesn't render HTML)
-  const plainText = html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-    .replace(/<[^>]+>/g, '\n')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/\n\s*\n/g, '\n\n')
-    .trim();
+  const baseName = path.basename(sourcePath, path.extname(sourcePath));
 
-  // Step 3: Generate PDF using pdfkit
   return new Promise<Buffer>((resolve, reject) => {
     const doc = new PDFDocument({ margin: 50 });
     const chunks: Buffer[] = [];
 
-    // Register custom fonts so pdfkit can find AFM files in bundled Electron app
     registerPdfkitFonts(doc);
 
     doc.on('data', (chunk) => chunks.push(chunk));
     doc.on('end', () => resolve(Buffer.concat(chunks)));
     doc.on('error', reject);
 
-    // Add title from source filename
-    const baseName = path.basename(sourcePath, path.extname(sourcePath));
     doc.fontSize(18).font('Helvetica-Bold').text(baseName, { align: 'center' });
     doc.moveDown();
 
-    // Add content
-    doc.fontSize(11).font('Helvetica').text(plainText, { align: 'left' });
+    // Strip script/style content, then parse HTML into pdfkit formatting
+    let cleanHtml = html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+
+    // Decode HTML entities
+    cleanHtml = cleanHtml
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+
+    // Parse block-level elements and render with appropriate formatting
+    const blocks = cleanHtml.split(/(<\/?(?:h[1-6]|p|ul|ol|li|pre|blockquote|hr|br)[^>]*>)/gi);
+    let inList = false;
+    let listOrdered = false;
+    let listCounter = 0;
+
+    for (const block of blocks) {
+      const lower = block.toLowerCase().trim();
+      if (!lower) continue;
+
+      if (lower.startsWith('<h1')) { doc.fontSize(18).font('Helvetica-Bold'); continue; }
+      if (lower.startsWith('<h2')) { doc.fontSize(16).font('Helvetica-Bold'); continue; }
+      if (lower.startsWith('<h3')) { doc.fontSize(14).font('Helvetica-Bold'); continue; }
+      if (lower.startsWith('<h4')) { doc.fontSize(12).font('Helvetica-Bold'); continue; }
+      if (lower.startsWith('<h5') || lower.startsWith('<h6')) { doc.fontSize(11).font('Helvetica-Bold'); continue; }
+      if (lower.startsWith('</h1') || lower.startsWith('</h2') || lower.startsWith('</h3') ||
+          lower.startsWith('</h4') || lower.startsWith('</h5') || lower.startsWith('</h6')) {
+        doc.moveDown(0.5);
+        doc.font('Helvetica').fontSize(11);
+        continue;
+      }
+      if (lower.startsWith('<p')) { doc.font('Helvetica').fontSize(11); continue; }
+      if (lower.startsWith('</p>')) { doc.moveDown(0.3); continue; }
+      if (lower.startsWith('<ul')) { inList = true; listOrdered = false; continue; }
+      if (lower.startsWith('</ul>')) { inList = false; doc.moveDown(0.3); continue; }
+      if (lower.startsWith('<ol')) { inList = true; listOrdered = true; listCounter = 1; continue; }
+      if (lower.startsWith('</ol>')) { inList = false; doc.moveDown(0.3); continue; }
+      if (lower.startsWith('<li')) {
+        if (inList) {
+          const prefix = listOrdered ? `${listCounter}. ` : '- ';
+          if (listOrdered) listCounter++;
+          doc.font('Helvetica').fontSize(11);
+          doc.text(prefix, { indent: 20, continued: false });
+        }
+        continue;
+      }
+      if (lower.startsWith('</li>')) { continue; }
+      if (lower.startsWith('<pre')) { doc.font('Courier').fontSize(9); continue; }
+      if (lower.startsWith('</pre>')) { doc.moveDown(0.3); doc.font('Helvetica').fontSize(11); continue; }
+      if (lower.startsWith('<blockquote')) {
+        doc.font('Helvetica-Oblique').fontSize(10);
+        continue;
+      }
+      if (lower.startsWith('</blockquote>')) { doc.moveDown(0.3); doc.font('Helvetica').fontSize(11); continue; }
+      if (lower.startsWith('<hr')) {
+        doc.moveDown(0.5);
+        const y = doc.y;
+        doc.moveTo(50, y).lineTo(doc.page.width - 50, y).stroke();
+        doc.moveDown(0.5);
+        continue;
+      }
+      if (lower.startsWith('<br')) { doc.moveDown(0.2); continue; }
+
+      // Text content — apply inline formatting
+      const text = block
+        .replace(/<strong>|<\/strong>/gi, '')
+        .replace(/<b>|<\/b>/gi, '')
+        .replace(/<em>|<\/em>/gi, '')
+        .replace(/<i>|<\/i>/gi, '')
+        .replace(/<code>|<\/code>/gi, '')
+        .replace(/<[^>]+>/g, '')
+        .trim();
+
+      if (text) {
+        doc.text(text, { align: 'left' });
+      }
+    }
 
     doc.end();
   });
@@ -2485,7 +2607,7 @@ export async function convertFile(
         converted = await convertMarkdownToDocx(convertTxtToMarkdown(content as string), htmlOptions);
         break;
       case 'mermaid->txt':
-        converted = content as string;
+        converted = convertMermaidToText(content as string);
         break;
       case 'mermaid->md':
         converted = '```mermaid\n' + (content as string) + '\n```\n';

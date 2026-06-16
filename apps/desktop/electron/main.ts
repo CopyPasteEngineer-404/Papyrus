@@ -14,7 +14,7 @@ const SUPPORTED_FORMATS_NO_EXT = ['md', 'csv', 'txt', 'mermaid', 'mmd', 'html', 
 /** Map file extension (without dot) to SourceFormat for conversion routing */
 const EXT_TO_SOURCE_FORMAT: Record<string, SourceFormat> = {
   md: 'md', markdown: 'md', csv: 'csv', txt: 'txt', text: 'txt',
-  mmd: 'mermaid', mermaid: 'mermaid', tex: 'latex', latex: 'latex', docx: 'docx',
+  mmd: 'mermaid', mermaid: 'mermaid', html: 'html', tex: 'latex', latex: 'latex', docx: 'docx',
 };
 
 // ESM-safe __dirname replacement — must be computed at module top-level
@@ -720,6 +720,9 @@ ipcMain.handle('convert:file', async (_event, payload: { sourceFilePath: string;
   }
   if (!exportManager) {
     throw new Error('Export manager not initialized. Try reopening the workspace.');
+  }
+  if (!converterPool) {
+    throw new Error('Converter not initialized. Try reopening the workspace.');
   }
 
   // Security: ensure source file is within the workspace
@@ -1496,10 +1499,8 @@ function handleFileChange(type: string, filePath: string): void {
 
   // Use currentWorkspace to find the correct workspace ID
   let changeWorkspaceId: string | undefined;
-  if (currentWorkspace) {
-    const ws = workspaceRepo.findByPath(currentWorkspace);
-    if (ws) changeWorkspaceId = ws.id;
-  }
+  const ws = workspaceRepo.findByPath(currentWorkspace!);
+  if (ws) changeWorkspaceId = ws.id;
   if (!changeWorkspaceId) {
     const workspaces = workspaceRepo.getAll();
     if (workspaces.length === 0) return;

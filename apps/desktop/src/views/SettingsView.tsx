@@ -156,15 +156,6 @@ export const SettingsView: React.FC = () => {
       previewOverlay: `radial-gradient(circle at 50% 50%, rgba(200, 121, 65, 0.2) 0%, transparent 60%)`,
       iconLetter: 'M',
     },
-    {
-      id: 'threejs',
-      name: 'Three.js Theme',
-      desc: 'Ancient quill & ink in 3D',
-      accent: '#C4A265',
-      previewBg: 'linear-gradient(135deg, #0a0805 0%, #120f0a 40%, #1a1510 100%)',
-      previewOverlay: `radial-gradient(circle at 40% 50%, rgba(196, 162, 101, 0.25) 0%, transparent 60%), radial-gradient(circle at 70% 30%, rgba(212, 197, 160, 0.1) 0%, transparent 40%)`,
-      iconLetter: 'Q',
-    },
   ];
 
   return (

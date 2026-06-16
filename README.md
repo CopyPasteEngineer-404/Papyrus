@@ -60,21 +60,7 @@ monorepo/
 
 ### 🧪 Testing
 
-| Suite | Tests | Status |
-|-------|-------|--------|
-| Converter | 31 | ✅ All passing |
-| Database | 24 | ✅ All passing |
-| **Total** | **55** | **✅ All passing** |
-
-### 🎨 3D Theme
-
-Ancien papyrus aesthetic — not cyberpunk:
-- **Floating quill** with animated rotation
-- **1200 warm-gold particles** with custom GLSL shader
-- **30 falling ink drops** with splash effect
-- **Parchment ground rings**
-- **Custom cursor**: 6px gold dot + 32px ring + 80px glow trail
-- **Glass-morphism UI**: `backdrop-filter: blur(20px)`, gold accents (`#C4A265`)
+Tests use Vitest. Run `npm test` to execute the full suite.
 
 ---
 
@@ -239,7 +225,7 @@ Content Security Policy is set in `main.ts`. In dev mode, connections to Vite HM
 | CSV Parsing | Quoted fields with commas may not render correctly in preview |
 | LaTeX Math | Math notation converted to plain text in pdfkit fallback |
 | AI Features | Disabled in v1 (Ollama, RAG, semantic search) |
-| Mermaid Rendering | Diagrams shown as code text, not rendered |
+| Mermaid Rendering | Rendered in generated HTML via CDN mermaid.js |
 | Auto-Update | Users must download new versions manually |
 
 ## v2 Roadmap

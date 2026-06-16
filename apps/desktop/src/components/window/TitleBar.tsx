@@ -71,23 +71,6 @@ export const TitleBar: React.FC<TitleBarProps> = ({ workspaceName }) => {
             <polygon points="4,12 20,20 20,36 4,28" fill={ISO_ACCENT_DARK} stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />
             <polygon points="20,20 36,12 36,28 20,36" fill="#5A7A9F" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
           </svg>
-        ) : themeSkin === 'threejs' ? (
-          /* Three.js icon — golden quill nib */
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 40 40"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-label="Papyrus"
-            role="img"
-          >
-            <path d="M20 4 L20 28" stroke="#C4A265" strokeWidth="2" strokeLinecap="round"/>
-            <path d="M20 6 C14 10, 8 18, 6 26 C8 22, 14 16, 20 12" fill="#C4A265" fillOpacity="0.35"/>
-            <path d="M20 6 C26 10, 32 18, 34 26 C32 22, 26 16, 20 12" fill="#C4A265" fillOpacity="0.35"/>
-            <path d="M18 26 L17 32 L20 36 L23 32 L22 26" fill="#A68B4B"/>
-            <circle cx="20" cy="20" r="12" fill="#C4A265" opacity="0.04"/>
-          </svg>
         ) : (
           /* Papyrus quill icon — matches intro animation's quill */
           <svg
@@ -121,8 +104,8 @@ export const TitleBar: React.FC<TitleBarProps> = ({ workspaceName }) => {
             />
           </svg>
         )}
-        <span className={`text-sm font-semibold text-foreground ${themeSkin === 'halftone' ? 'uppercase tracking-wider' : themeSkin === 'isometric' ? 'tracking-wide' : themeSkin === 'threejs' ? 'tracking-widest' : ''}`}>
-          {themeSkin === 'halftone' ? 'PAPYRUS' : themeSkin === 'threejs' ? 'PAPYRUS' : 'Papyrus'}
+        <span className={`text-sm font-semibold text-foreground ${themeSkin === 'halftone' ? 'uppercase tracking-wider' : themeSkin === 'isometric' ? 'tracking-wide' : ''}`}>
+          {themeSkin === 'halftone' ? 'PAPYRUS' : 'Papyrus'}
         </span>
       </div>
 

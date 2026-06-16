@@ -94,22 +94,6 @@ export const ScribbleLoader: React.FC<ScribbleLoaderProps> = ({ size = 'md', cla
             <line x1="30" y1="8" x2="30" y2="2" stroke="var(--accent-primary, #6C8EBF)" strokeWidth="0.5" opacity="0.3" />
             <line x1="48" y1="18" x2="54" y2="15" stroke="var(--accent-primary, #6C8EBF)" strokeWidth="0.5" opacity="0.3" />
           </>
-        ) : themeSkin === 'threejs' ? (
-          /* Three.js: Floating quill with ink drops */
-          <>
-            {/* Quill shaft */}
-            <line x1="30" y1="8" x2="30" y2="42" stroke="#C4A265" strokeWidth="2" strokeLinecap="round" />
-            {/* Quill feathers */}
-            <path d="M30 12 C18 18, 10 30, 8 38 C14 30, 22 22, 30 16" fill="#C4A265" opacity="0.2" />
-            <path d="M30 12 C42 18, 50 30, 52 38 C46 30, 38 22, 30 16" fill="#C4A265" opacity="0.2" />
-            {/* Nib */}
-            <path d="M28 40 L26 46 L30 52 L34 46 L32 40" fill="#A68B4B" />
-            {/* Ink drops */}
-            <circle cx="30" cy="54" r="1.5" fill="#C4A265" opacity="0.4" className="scribble-ink-drop" style={{ animationDelay: '0.2s' }} />
-            <circle cx="33" cy="56" r="0.8" fill="#C4A265" opacity="0.25" className="scribble-ink-drop" style={{ animationDelay: '0.6s' }} />
-            {/* Warm glow ring */}
-            <circle cx="30" cy="30" r="16" fill="none" stroke="#C4A265" strokeWidth="0.4" opacity="0.12" className="scribble-circle" />
-          </>
         ) : themeSkin === 'minimalart' ? (
           /* Minimal Art: Elegant minimal circle with varying line weight */
           <>

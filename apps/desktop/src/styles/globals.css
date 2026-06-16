@@ -17,7 +17,6 @@
 @import './themes/halftone.css';
 @import './themes/isometric.css';
 @import './themes/minimalart.css';
-@import './themes/threejs.css';
 
 /* 3. Custom cursors & theme-specific visual effects */
 @import './cursors.css';

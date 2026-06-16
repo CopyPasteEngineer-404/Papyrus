@@ -8,16 +8,6 @@ interface FileEditorProps {
   onClose: () => void;
 }
 
-/** Simple syntax highlighting keywords for common formats */
-const SYNTAX_KEYWORDS: Record<string, string[]> = {
-  js: ['function', 'const', 'let', 'var', 'if', 'else', 'return', 'import', 'export', 'from', 'default', 'class', 'extends', 'new', 'this', 'async', 'await', 'try', 'catch', 'throw', 'typeof', 'instanceof', 'true', 'false', 'null', 'undefined'],
-  ts: ['function', 'const', 'let', 'var', 'if', 'else', 'return', 'import', 'export', 'from', 'default', 'class', 'extends', 'new', 'this', 'async', 'await', 'try', 'catch', 'throw', 'typeof', 'instanceof', 'interface', 'type', 'enum', 'implements', 'true', 'false', 'null', 'undefined'],
-  json: ['true', 'false', 'null'],
-  css: ['color', 'background', 'margin', 'padding', 'border', 'display', 'position', 'width', 'height', 'font-size', 'flex', 'grid', 'transition', 'transform', 'opacity', 'overflow'],
-  html: ['div', 'span', 'p', 'a', 'img', 'ul', 'li', 'h1', 'h2', 'h3', 'table', 'tr', 'td', 'th', 'form', 'input', 'button', 'script', 'style', 'head', 'body', 'html', 'class', 'id', 'src', 'href'],
-  md: ['#', '##', '###', '```', '---', '- ', '* ', '1.'],
-};
-
 function getFileExt(fileName: string): string {
   return fileName.split('.').pop()?.toLowerCase() || '';
 }
@@ -38,9 +28,6 @@ export const FileEditor: React.FC<FileEditorProps> = ({ filePath, fileName, onCl
   const [isDirty, setIsDirty] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
-
-  const ext = getFileExt(fileName);
-  const keywords = SYNTAX_KEYWORDS[ext] || [];
 
   // Load file content
   useEffect(() => {

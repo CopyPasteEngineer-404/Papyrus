@@ -23,9 +23,6 @@ const TasksView = lazy(() => import('../views/TasksView').then(m => ({ default: 
 const ExportsView = lazy(() => import('../views/ExportsView').then(m => ({ default: m.ExportsView })));
 const SettingsView = lazy(() => import('../views/SettingsView').then(m => ({ default: m.SettingsView })));
 
-// Lazy-load Three.js (only needed for threejs skin, saves ~250 kB from main bundle)
-const ThreeJsBackground = lazy(() => import('../components/theme/skins/threejs/ThreeJsBackground'));
-const ThreeJsCursor = lazy(() => import('../components/theme/skins/threejs/ThreeJsCursor'));
 
 /** Map icon names to Lucide components */
 const surfaceIconMap: Record<string, typeof Search> = {
@@ -146,7 +143,7 @@ export const AppShell: React.FC = () => {
     if (themeSkin === 'halftone') return 'sidebar-collapse-halftone';
     if (themeSkin === 'isometric') return 'sidebar-collapse-isometric';
     if (themeSkin === 'minimalart') return 'sidebar-collapse-minimalart';
-    if (themeSkin === 'threejs') return 'sidebar-collapse-threejs';
+
     return 'sidebar-collapse-papyrus';
   };
 
@@ -201,8 +198,6 @@ export const AppShell: React.FC = () => {
   if (layoutMode === 'tabs') {
     return (
       <div className="app-layout">
-        {themeSkin === 'threejs' && <Suspense fallback={null}><ThreeJsBackground /></Suspense>}
-        {themeSkin === 'threejs' && <Suspense fallback={null}><ThreeJsCursor /></Suspense>}
         <TitleBar workspaceName={workspace.name} />
 
         {/* Tab Bar — redesigned browser-style tabs */}
@@ -343,8 +338,6 @@ export const AppShell: React.FC = () => {
   // ─── Default Sidebar Layout ───
   return (
     <div className="app-layout">
-      {themeSkin === 'threejs' && <Suspense fallback={null}><ThreeJsBackground /></Suspense>}
-      {themeSkin === 'threejs' && <Suspense fallback={null}><ThreeJsCursor /></Suspense>}
       <TitleBar workspaceName={workspace.name} />
 
       <div className="app-main-row">

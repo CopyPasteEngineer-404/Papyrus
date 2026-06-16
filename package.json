@@ -28,7 +28,6 @@
     "typescript": "^5.8.2",
     "vite": "^5.4.0",
     "vite-plugin-electron": "^0.28.0",
-    "vite-plugin-electron-renderer": "^0.14.6",
     "vitest": "^4.1.8",
     "zod": "^3.23.0"
   },
@@ -36,8 +35,5 @@
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
   },
-  "license": "MIT",
-  "dependencies": {
-    "mermaid": "^11.15.0"
-  }
+  "license": "MIT"
 }

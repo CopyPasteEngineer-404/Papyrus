@@ -385,66 +385,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* ════════════════════════════════════════════════════════════
-   THREE.JS THEME — MICRO-ANIMATIONS
-   ════════════════════════════════════════════════════════════ */
-
-[data-theme-skin="threejs"] {
-  --ease-ink: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --ease-parchment: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Warm gold glow pulse */
-@keyframes threejs-gold-glow {
-  0%, 100% { box-shadow: 0 0 6px rgba(196, 162, 101, 0.15); }
-  50% { box-shadow: 0 0 18px rgba(196, 162, 101, 0.3); }
-}
-
-/* Ink spread animation */
-@keyframes threejs-ink-spread {
-  0% { opacity: 0; transform: scale(0.8); filter: blur(2px); }
-  50% { opacity: 0.3; }
-  100% { opacity: 0; transform: scale(1.2); filter: blur(4px); }
-}
-
-/* Gentle float for elements */
-@keyframes threejs-float-parchment {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
-}
-
-[data-theme-skin="threejs"] .threejs-gold-glow {
-  animation: threejs-gold-glow 2.5s ease-in-out infinite;
-}
-
-[data-theme-skin="threejs"] .threejs-float {
-  animation: threejs-float-parchment 3s ease-in-out infinite;
-}
-
-[data-theme-skin="threejs"] .hover-glow:hover {
-  box-shadow: 0 0 12px rgba(196, 162, 101, 0.2);
-  transition: all 0.2s var(--ease-parchment);
-}
-
-/* Sidebar entrance */
-[data-theme-skin="threejs"] .sidebar-nav-item {
-  transition: all 0.2s var(--ease-parchment);
-}
-
-[data-theme-skin="threejs"] .sidebar-nav-item:hover {
-  transform: translateX(2px);
-}
-
-/* Tab switch */
-[data-theme-skin="threejs"] .tab-switch-enter {
-  animation: threejs-fade-in 0.3s var(--ease-parchment) forwards;
-}
-
-@keyframes threejs-fade-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 /* ─── Reduced Motion Support ─── */
 
 @media (prefers-reduced-motion: reduce) {

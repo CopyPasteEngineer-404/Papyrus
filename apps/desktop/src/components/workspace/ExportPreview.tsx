@@ -76,7 +76,7 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ file, onClose }) => {
   const FormatIcon = file.format === 'csv' ? Table2 : file.format === 'mmd' ? FileCode : file.format === 'html' ? FileCode : file.format === 'txt' ? FileText : FileText;
 
   // Binary formats that can't be previewed as text
-  const isBinaryFormat = file.format === 'pdf' || file.format === 'docx' || file.format === 'pdf';
+  const isBinaryFormat = file.format === 'pdf' || file.format === 'docx';
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -156,24 +156,15 @@ const ExportPreview: React.FC<ExportPreviewProps> = ({ file, onClose }) => {
         )}
 
         {content && file.format === 'html' && (
-          <iframe
-            srcDoc={content}
-            className="w-full flex-1 border-0 rounded"
-            style={{ minHeight: '300px', backgroundColor: '#fff' }}
-            title="HTML Preview"
-            sandbox="allow-scripts"
-          />
-        )}
-
-        {content && file.format === 'html' && (
-          <details className="mt-2">
-            <summary className="text-xs cursor-pointer" style={{ color: 'var(--fg-dim)' }}>View source</summary>
-            <pre
-              className="text-xs whitespace-pre-wrap font-mono leading-relaxed mt-1 p-2 rounded"
-              style={{ color: 'var(--fg-secondary)', backgroundColor: 'var(--bg-secondary)' }}
-            >
-              {content}
-            </pre>
+          <details className="mt-2" open>
+            <summary className="text-xs cursor-pointer" style={{ color: 'var(--fg-dim)' }}>Preview</summary>
+            <iframe
+              srcDoc={content}
+              className="w-full border-0 rounded mt-1"
+              style={{ minHeight: '300px', backgroundColor: '#fff' }}
+              title="HTML Preview"
+              sandbox="allow-scripts"
+            />
           </details>
         )}
 

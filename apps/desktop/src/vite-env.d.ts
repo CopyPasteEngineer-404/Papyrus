@@ -89,7 +89,7 @@ interface MainToRendererPayloads {
 interface AppSettings {
   aiProvider: 'ollama' | 'openai' | 'none';
   theme: 'light' | 'dark' | 'system';
-  themeSkin: 'papyrus' | 'halftone' | 'isometric' | 'minimalart' | 'threejs';
+  themeSkin: 'papyrus' | 'halftone' | 'isometric' | 'minimalart';
   defaultConstraints?: {
     pdf?: any;
     md?: any;

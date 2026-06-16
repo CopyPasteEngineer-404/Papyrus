@@ -34,7 +34,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   const percent = Math.min(100, Math.max(0, (value / max) * 100));
 
   return (
-    <div className={clsx('w-full', className)} role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100}>
+    <div className={clsx('w-full', className)} role="progressbar" aria-label={label || 'Progress'} aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100}>
       {(label || showPercent) && (
         <div className="flex items-center justify-between mb-1">
           {label && <span className="text-xs text-foreground-muted">{label}</span>}

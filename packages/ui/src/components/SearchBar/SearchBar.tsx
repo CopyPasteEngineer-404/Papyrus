@@ -55,6 +55,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             className="w-full pl-9 pr-8 py-2 bg-background-secondary border border-border rounded-lg text-sm text-foreground placeholder:text-foreground-dim focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30 transition-colors"
             type="text"
             placeholder="Search by filename, path, or extension..."
+            aria-label="Search files"
             value={value}
             onChange={(e) => {
               // Direct state update — never blocked
@@ -82,10 +83,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           Search
         </button>
       </div>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1" role="tablist" aria-label="Search filters">
         {tabs.map((tab) => (
           <button
             key={tab}
+            role="tab"
+            aria-selected={activeTab === tab}
             className={clsx(
               'px-3 py-1 rounded-md text-xs font-medium transition-colors duration-fast',
               activeTab === tab

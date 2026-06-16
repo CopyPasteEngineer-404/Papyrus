@@ -6,7 +6,6 @@ import { Wordmark } from './Wordmark';
 import { HalftoneIntro } from './HalftoneIntro';
 import { IsometricIntro } from './IsometricIntro';
 import { MinimalArtIntro } from './MinimalArtIntro';
-import { ThreeJsIntro } from './ThreeJsIntro';
 import { useTheme } from '../theme';
 import './intro.css';
 
@@ -18,7 +17,6 @@ import './intro.css';
  *  - 'halftone': Dots rearranging into ASCII shadow PAPYRUS
  *  - 'isometric': Grid + isometric cube + blueprint wordmark
  *  - 'minimalart': Golden line + elegant serif wordmark
- *  - 'threejs': Glowing orb with orbit rings + neon wordmark
  *
  * All intros share the same contract: they call onComplete() when done.
  */
@@ -42,10 +40,6 @@ export const IntroSequence: React.FC<IntroSequenceProps> = ({ onComplete }) => {
 
   if (themeSkin === 'minimalart') {
     return <MinimalArtIntro onComplete={onComplete} />;
-  }
-
-  if (themeSkin === 'threejs') {
-    return <ThreeJsIntro onComplete={onComplete} />;
   }
 
   // Default: Papyrus intro

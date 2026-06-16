@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 
 type ThemePreference = 'light' | 'dark' | 'system';
 type ResolvedTheme = 'light' | 'dark';
-type ThemeSkin = 'papyrus' | 'halftone' | 'isometric' | 'minimalart' | 'threejs';
+type ThemeSkin = 'papyrus' | 'halftone' | 'isometric' | 'minimalart';
 
 interface ThemeContextValue {
   /** The user's preference (may be 'system') */
@@ -89,7 +89,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         if (settings?.theme && ['light', 'dark', 'system'].includes(settings.theme)) {
           setThemeState(settings.theme as ThemePreference);
         }
-        if (settings?.themeSkin && ['papyrus', 'halftone', 'isometric', 'minimalart', 'threejs'].includes(settings.themeSkin)) {
+        if (settings?.themeSkin && ['papyrus', 'halftone', 'isometric', 'minimalart'].includes(settings.themeSkin)) {
           setThemeSkinState(settings.themeSkin as ThemeSkin);
         }
       } catch {
