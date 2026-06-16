@@ -1,0 +1,43 @@
+{
+  "name": "papyrus",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Offline-first intelligent multi-format document transformation harness",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@papyrus/desktop",
+    "build": "npm run build --workspace=@papyrus/shared && npm run build --workspace=@papyrus/ir && npm run build --workspace=@papyrus/parsers && npm run build --workspace=@papyrus/workers && npm run build --workspace=@papyrus/orchestrator && npm run build --workspace=@papyrus/database && npm run build --workspace=@papyrus/ui && npm run build --workspace=@papyrus/desktop",
+    "build:packages": "npm run build --workspace=@papyrus/shared && npm run build --workspace=@papyrus/ir && npm run build --workspace=@papyrus/parsers && npm run build --workspace=@papyrus/workers && npm run build --workspace=@papyrus/orchestrator && npm run build --workspace=@papyrus/database && npm run build --workspace=@papyrus/ui",
+    "build:desktop": "npm run build --workspace=@papyrus/desktop",
+    "clean": "rimraf dist",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "@vitejs/plugin-react": "^4.3.0",
+    "autoprefixer": "^10.4.19",
+    "electron": "28.0.0",
+    "electron-builder": "^24.13.0",
+    "postcss": "^8.4.38",
+    "rimraf": "^6.0.1",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^5.8.2",
+    "vite": "^5.4.0",
+    "vite-plugin-electron": "^0.28.0",
+    "vite-plugin-electron-renderer": "^0.14.6",
+    "vitest": "^4.1.8",
+    "zod": "^3.23.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "mermaid": "^11.15.0"
+  }
+}

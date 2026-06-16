@@ -1,0 +1,314 @@
+/**
+ * Three.js Theme — Ancient papyrus with modern 3D
+ *
+ * A warm, timeless theme inspired by parchment, quill, and ink,
+ * brought to life with modern glass-morphism and a Three.js 3D scene.
+ * Deep sepia-browns, warm golds, and ink blacks create an atmosphere
+ * of an ancient library reimagined for the digital age.
+ *
+ * Data attribute: [data-theme-skin="threejs"]
+ */
+
+/* ════════════════════════════════════════════════════════════
+   THREE.JS THEME — DARK MODE
+   ════════════════════════════════════════════════════════════ */
+[data-theme-skin="threejs"][data-theme="dark"],
+[data-theme-skin="threejs"]:root {
+  /* ─── Backgrounds — translucent warm dark ─── */
+  --bg-primary: transparent;
+  --bg-secondary: rgba(18, 15, 12, 0.65);
+  --bg-surface: rgba(26, 22, 18, 0.55);
+  --bg-card: rgba(32, 27, 22, 0.5);
+  --bg-hover: rgba(42, 35, 28, 0.6);
+  --bg-active: rgba(52, 44, 35, 0.7);
+  --bg-muted: rgba(20, 17, 14, 0.4);
+
+  /* ─── Foreground — warm off-white ─── */
+  --fg-primary: #f0ece4;
+  --fg-secondary: #cfc5b4;
+  --fg-muted: #9a8e7a;
+  --fg-dim: #6b5f4e;
+  --fg-inverse: #0a0805;
+
+  /* ─── Borders — warm bronze ─── */
+  --border-default: rgba(90, 75, 55, 0.4);
+  --border-hover: rgba(120, 100, 75, 0.5);
+  --border-active: rgba(150, 125, 95, 0.6);
+  --border-focus: #C4A265;
+
+  /* ─── Accent — Gold ─── */
+  --accent-primary: #C4A265;
+  --accent-primary-hover: #D4B87A;
+  --accent-primary-active: #E8D5A3;
+  --accent-primary-muted: rgba(196, 162, 101, 0.2);
+
+  /* ─── Secondary Accent — Deep ink ─── */
+  --accent-secondary: #8B6914;
+  --accent-secondary-hover: #A07D1A;
+  --accent-secondary-muted: rgba(139, 105, 20, 0.2);
+
+  /* ─── Tertiary Accent — Parchment ─── */
+  --accent-tertiary: #d4c5a0;
+  --accent-tertiary-muted: rgba(212, 197, 160, 0.15);
+
+  /* ─── Status ─── */
+  --status-success: #5a8f5a;
+  --status-success-muted: rgba(90, 143, 90, 0.2);
+  --status-warning: #c49a3a;
+  --status-warning-muted: rgba(196, 154, 58, 0.2);
+  --status-error: #a04040;
+  --status-error-muted: rgba(160, 64, 64, 0.2);
+  --status-info: #C4A265;
+  --status-info-muted: rgba(196, 162, 101, 0.2);
+
+  /* ─── Format accents ─── */
+  --accent-pdf: #c0392b;
+  --accent-md: #C4A265;
+  --accent-csv: #5a8f5a;
+  --accent-mmd: #8B6914;
+  --accent-txt: #cfc5b4;
+
+  /* ─── Shadows — warm glow ─── */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 0 8px rgba(196, 162, 101, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 16px rgba(196, 162, 101, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 24px rgba(196, 162, 101, 0.04);
+  --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 32px rgba(196, 162, 101, 0.03);
+
+  /* ─── Glass morphism ─── */
+  --glass-bg: rgba(18, 15, 12, 0.4);
+  --glass-border: rgba(196, 162, 101, 0.08);
+  --glass-blur: 20px;
+
+  /* ─── Typography ─── */
+  --font-weight-normal: 350;
+  --font-weight-medium: 450;
+  --font-weight-semibold: 550;
+  --font-weight-bold: 650;
+
+  /* ─── Radii ─── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-2xl: 22px;
+  --radius-full: 9999px;
+
+  /* ─── Transitions ─── */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ════════════════════════════════════════════════════════════
+   THREE.JS THEME — LIGHT MODE
+   ════════════════════════════════════════════════════════════ */
+[data-theme-skin="threejs"][data-theme="light"] {
+  --bg-primary: transparent;
+  --bg-secondary: rgba(235, 225, 210, 0.6);
+  --bg-surface: rgba(250, 245, 235, 0.55);
+  --bg-card: rgba(255, 250, 240, 0.6);
+  --bg-hover: rgba(245, 238, 225, 0.7);
+  --bg-active: rgba(235, 225, 210, 0.8);
+  --bg-muted: rgba(250, 248, 240, 0.5);
+
+  --fg-primary: #1a1510;
+  --fg-secondary: #4a4035;
+  --fg-muted: #8a7e6e;
+  --fg-dim: #b0a594;
+  --fg-inverse: #f5efe5;
+
+  --border-default: rgba(180, 165, 140, 0.5);
+  --border-hover: rgba(160, 145, 120, 0.6);
+  --border-active: rgba(140, 125, 100, 0.7);
+  --border-focus: #8B6914;
+
+  --accent-primary: #8B6914;
+  --accent-primary-hover: #A07D1A;
+  --accent-primary-active: #C4A265;
+  --accent-primary-muted: rgba(139, 105, 20, 0.12);
+
+  --accent-secondary: #a04040;
+  --accent-secondary-hover: #b84a4a;
+  --accent-secondary-muted: rgba(160, 64, 64, 0.1);
+
+  --accent-tertiary: #6b5f4e;
+  --accent-tertiary-muted: rgba(107, 95, 78, 0.1);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 8px rgba(139, 105, 20, 0.03);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06), 0 0 16px rgba(139, 105, 20, 0.02);
+
+  --glass-bg: rgba(250, 245, 235, 0.5);
+  --glass-border: rgba(139, 105, 20, 0.06);
+  --glass-blur: 12px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   STACKING CONTEXT — canvas behind all content
+   ════════════════════════════════════════════════════════════ */
+[data-theme-skin="threejs"] .app-layout {
+  position: relative;
+  z-index: 0;
+}
+
+[data-theme-skin="threejs"] body {
+  background: transparent !important;
+}
+
+[data-theme-skin="threejs"] .app-layout > *:not(canvas):not(.threejs-cursor-dot):not(.threejs-cursor-ring) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ════════════════════════════════════════════════════════════
+   GLASS-MORPHISM SURFACES
+   ════════════════════════════════════════════════════════════ */
+
+[data-theme-skin="threejs"] .glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}
+
+[data-theme-skin="threejs"] [class*="sidebar"] {
+  background: var(--bg-secondary) !important;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-right: 1px solid var(--glass-border);
+}
+
+[data-theme-skin="threejs"] .drag-region,
+[data-theme-skin="threejs"] [class*="titlebar"],
+[data-theme-skin="threejs"] [class*="TitleBar"] {
+  background: var(--bg-secondary) !important;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--glass-border) !important;
+}
+
+[data-theme-skin="threejs"] [class*="statusbar"],
+[data-theme-skin="threejs"] [class*="StatusBar"] {
+  background: var(--bg-secondary) !important;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-top: 1px solid var(--glass-border) !important;
+}
+
+[data-theme-skin="threejs"] .app-content {
+  background: transparent !important;
+}
+
+[data-theme-skin="threejs"] [class*="workflow"],
+[data-theme-skin="threejs"] [class*="Workflow"] {
+  background: var(--bg-secondary) !important;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-left: 1px solid var(--glass-border) !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   SURFACE TABS
+   ════════════════════════════════════════════════════════════ */
+[data-theme-skin="threejs"] .surface-tab {
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+[data-theme-skin="threejs"] .surface-tab.active {
+  border-bottom-color: var(--accent-primary);
+  color: var(--accent-primary);
+  text-shadow: 0 0 8px rgba(196, 162, 101, 0.2);
+}
+
+/* ════════════════════════════════════════════════════════════
+   GLOW TEXT
+   ════════════════════════════════════════════════════════════ */
+[data-theme-skin="threejs"] .glow-text {
+  text-shadow: 0 0 10px rgba(196, 162, 101, 0.25), 0 0 20px rgba(196, 162, 101, 0.12);
+}
+
+/* ════════════════════════════════════════════════════════════
+   SCROLLBAR
+   ════════════════════════════════════════════════════════════ */
+[data-theme-skin="threejs"] ::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+[data-theme-skin="threejs"] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-theme-skin="threejs"] ::-webkit-scrollbar-thumb {
+  background: rgba(196, 162, 101, 0.15);
+  border-radius: 3px;
+}
+
+[data-theme-skin="threejs"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(196, 162, 101, 0.3);
+}
+
+/* ════════════════════════════════════════════════════════════
+   SELECTION & FOCUS
+   ════════════════════════════════════════════════════════════ */
+[data-theme-skin="threejs"] ::selection {
+  background: rgba(196, 162, 101, 0.25);
+  color: var(--fg-primary);
+}
+
+[data-theme-skin="threejs"] *:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary-muted), 0 0 12px rgba(196, 162, 101, 0.15);
+}
+
+/* ════════════════════════════════════════════════════════════
+   INPUT STYLING
+   ════════════════════════════════════════════════════════════ */
+[data-theme-skin="threejs"] input,
+[data-theme-skin="threejs"] textarea,
+[data-theme-skin="threejs"] select {
+  background: rgba(18, 15, 12, 0.35);
+  border: 1px solid var(--border-default);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+[data-theme-skin="threejs"] input:focus,
+[data-theme-skin="threejs"] textarea:focus,
+[data-theme-skin="threejs"] select:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-primary-muted);
+}
+
+/* ════════════════════════════════════════════════════════════
+   HOVER EFFECTS
+   ════════════════════════════════════════════════════════════ */
+[data-theme-skin="threejs"] .card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), 0 0 20px rgba(196, 162, 101, 0.08);
+  transition: all var(--transition-normal);
+}
+
+[data-theme-skin="threejs"] button:not([class*="window-control"]):hover {
+  box-shadow: 0 0 12px rgba(196, 162, 101, 0.1);
+}
+
+[data-theme-skin="threejs"] .app-layout,
+[data-theme-skin="threejs"] .app-layout * {
+  cursor: none !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   CARET BLINK
+   ════════════════════════════════════════════════════════════ */
+@keyframes threejs-caret-blink {
+  0%, 45% { caret-color: #C4A265; }
+  50%, 55% { caret-color: rgba(196, 162, 101, 0.3); }
+  60%, 100% { caret-color: transparent; }
+}
+
+[data-theme-skin="threejs"] input:focus,
+[data-theme-skin="threejs"] textarea:focus {
+  animation: threejs-caret-blink 1s step-end infinite;
+}

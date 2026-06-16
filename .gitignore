@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime data (generated per-workspace)
+*.db
+*.db.tmp
+*.db-journal
+*.corrupted.*
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Electron builder
+release/
+*.exe
+*.dmg
+*.AppImage

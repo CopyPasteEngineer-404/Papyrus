@@ -1,0 +1,1 @@
+export { MarkdownWorker } from './worker';
