@@ -68,7 +68,7 @@ monorepo/
 
 ### 🎨 3D Theme
 
-Ancien papyrus aesthetic — not cyberpunk:
+Ancient papyrus aesthetic — not cyberpunk:
 - **Floating quill** with animated rotation
 - **1200 warm-gold particles** with custom GLSL shader
 - **30 falling ink drops** with splash effect
