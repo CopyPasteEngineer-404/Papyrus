@@ -572,13 +572,14 @@ ipcMain.handle('task:create', async (_event, payload: { sourceFiles: string[]; o
     percentComplete: 0,
   });
 
+  let completedData: any = null;
+
   const task = await executePipeline(
     payload.sourceFiles,
     payload.outputFormats,
     payload.constraints,
     outputDir,
     (event, data) => {
-      // Check if task was cancelled
       if (abortController.signal.aborted) return;
 
       if (event === 'progress') {
@@ -587,91 +588,7 @@ ipcMain.handle('task:create', async (_event, payload: { sourceFiles: string[]; o
           percentComplete: calculateProgress(data),
         });
       } else if (event === 'completed') {
-        // Process async operations sequentially — do NOT fire-and-forget.
-        // The UI notification is sent AFTER all DB writes succeed to prevent
-        // the renderer from querying data that hasn't been persisted yet.
-        (async () => {
-          try {
-            if (data.task && data.task.results) {
-              const exports: any[] = [];
-              const workerResults: any[] = [];
-              for (const [format, result] of Object.entries(data.task.results)) {
-                const r = result as any;
-                if (r.artifacts) {
-                  for (const artifact of r.artifacts) {
-                    exports.push({
-                      format,
-                      outputPath: path.join(outputDir, artifact.filename),
-                      fileSize: artifact.size,
-                      sourcePath: payload.sourceFiles[0] || '',
-                    });
-                  }
-                }
-                workerResults.push({
-                  format,
-                  duration: r.duration || 0,
-                  success: r.success !== false,
-                });
-              }
-
-              // Export verification: verify each output file exists and has size > 0
-              for (const exp of exports) {
-                try {
-                  const stat = await fs.promises.stat(exp.outputPath);
-                  if (stat.size === 0) {
-                    logger.warn(`Export verification: file is empty (0 bytes): ${exp.outputPath}`);
-                    exp.fileSize = 0;
-                  } else {
-                    exp.fileSize = stat.size; // Use actual file size from disk
-                  }
-                } catch (verifyErr: any) {
-                  logger.error(`Export verification: file not found: ${exp.outputPath}`, verifyErr);
-                  exp.fileSize = 0;
-                }
-              }
-
-              for (const exp of exports) {
-                await exportManager?.recordExport(
-                  data.task.id, exp.format, exp.outputPath, exp.fileSize,
-                  exp.sourcePath, exp.format === 'pdf' ? 'pdf-worker' : exp.format === 'txt' ? 'txt-worker' : 'markdown-worker',
-                  workerResults.find(w => w.format === exp.format)?.duration,
-                );
-              }
-
-              if (exports.length > 0 && exportManager) {
-                const manifest = exportManager.generateManifest(data.task.id, exports, workerResults);
-                await exportManager.writeManifest(manifest);
-              }
-            }
-
-            // Record trace AFTER exports are persisted
-            if (db) {
-              const traceRepo = new TraceRepository(db.getDb());
-              const workspaceRepo = new WorkspaceRepository(db.getDb());
-              // Use currentWorkspace to find the correct workspace ID
-              let traceWorkspaceId: string | undefined;
-              if (currentWorkspace) {
-                const ws = workspaceRepo.findByPath(currentWorkspace);
-                if (ws) traceWorkspaceId = ws.id;
-              }
-              if (!traceWorkspaceId) {
-                const workspaces = workspaceRepo.getAll();
-                if (workspaces.length > 0) traceWorkspaceId = workspaces[0].id;
-              }
-              if (traceWorkspaceId) {
-                traceRepo.create(traceWorkspaceId, JSON.stringify(data.task));
-              }
-              // Mark DB as dirty after recording trace
-              db.markDirty();
-            }
-          } catch (err) {
-            logger.error('Error in task completion handler:', err);
-          }
-
-          // Notify UI ONLY after all DB writes have completed
-          activeAbortControllers.delete(taskId);
-          mainWindow?.webContents.send('task:completed', data);
-        })();
+        completedData = data;
       } else if (event === 'failed') {
         activeAbortControllers.delete(taskId);
         mainWindow?.webContents.send('task:failed', data);
@@ -685,6 +602,77 @@ ipcMain.handle('task:create', async (_event, payload: { sourceFiles: string[]; o
       }
     }
   );
+
+  // Process completion logic AFTER executePipeline resolves (properly awaited)
+  if (completedData?.task?.results) {
+    try {
+      const exports: any[] = [];
+      const workerResults: any[] = [];
+      for (const [format, result] of Object.entries(completedData.task.results)) {
+        const r = result as any;
+        if (r.artifacts) {
+          for (const artifact of r.artifacts) {
+            exports.push({
+              format,
+              outputPath: path.join(outputDir, artifact.filename),
+              fileSize: artifact.size,
+              sourcePath: payload.sourceFiles[0] || '',
+            });
+          }
+        }
+        workerResults.push({
+          format,
+          duration: r.duration || 0,
+          success: r.success !== false,
+        });
+      }
+
+      for (const exp of exports) {
+        try {
+          const stat = await fs.promises.stat(exp.outputPath);
+          exp.fileSize = stat.size > 0 ? stat.size : 0;
+        } catch {
+          exp.fileSize = 0;
+        }
+      }
+
+      for (const exp of exports) {
+        await exportManager?.recordExport(
+          completedData.task.id, exp.format, exp.outputPath, exp.fileSize,
+          exp.sourcePath, exp.format === 'pdf' ? 'pdf-worker' : exp.format === 'txt' ? 'txt-worker' : 'markdown-worker',
+          workerResults.find(w => w.format === exp.format)?.duration,
+        );
+      }
+
+      if (exports.length > 0 && exportManager) {
+        const manifest = exportManager.generateManifest(completedData.task.id, exports, workerResults);
+        await exportManager.writeManifest(manifest);
+      }
+
+      if (db) {
+        const traceRepo = new TraceRepository(db.getDb());
+        const workspaceRepo = new WorkspaceRepository(db.getDb());
+        let traceWorkspaceId: string | undefined;
+        if (currentWorkspace) {
+          const ws = workspaceRepo.findByPath(currentWorkspace);
+          if (ws) traceWorkspaceId = ws.id;
+        }
+        if (!traceWorkspaceId) {
+          const workspaces = workspaceRepo.getAll();
+          if (workspaces.length > 0) traceWorkspaceId = workspaces[0].id;
+        }
+        if (traceWorkspaceId) {
+          traceRepo.create(traceWorkspaceId, JSON.stringify(completedData.task));
+        }
+        db.markDirty();
+      }
+    } catch (err) {
+      logger.error('Error in task completion handler:', err);
+    }
+
+    activeAbortControllers.delete(taskId);
+    mainWindow?.webContents.send('task:completed', completedData);
+  }
 
   return task;
 });
@@ -1435,7 +1423,8 @@ function startFileWatcher(workspacePath: string): void {
       if (normalized.includes('node_modules/') ||
           normalized.includes('.git/') ||
           normalized.includes('exports/') ||
-          normalized.startsWith('.') && !normalized.includes('/')) {
+          normalized.includes('.papyrus/') ||
+          normalized.split('/')[0].startsWith('.')) {
         return;
       }
 
