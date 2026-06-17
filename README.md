@@ -91,16 +91,17 @@ npm run build:desktop
 npm test
 npm run test:watch
 ```
+## Contributions
+
+Contributions are welcomed (๑ᵕ◡ᵕ)
+Feel free to contribute (ˆ◡ˆc)
 
 ## License
 
 MIT
 
 
-## Contributions
 
-Contributions are welcomed (๑ᵕ◡ᵕ)
-Feel free to contribute (ˆ◡ˆc)
 
 
 
