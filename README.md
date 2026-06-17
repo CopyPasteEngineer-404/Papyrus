@@ -95,3 +95,15 @@ npm run test:watch
 ## License
 
 MIT
+
+
+## Contributions
+
+Contributions are welcomed (๑ᵕ◡ᵕ)
+Feel free to contribute (ˆ◡ˆc)
+
+
+
+
+
+
